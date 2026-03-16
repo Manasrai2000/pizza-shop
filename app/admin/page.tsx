@@ -90,7 +90,7 @@ export default async function AdminDashboard() {
                        </p>
                      </div>
                      <div className="ml-auto font-medium">
-                       +${order.total_amount.toFixed(2)}
+                       +₹{order.total_amount.toFixed(2)}
                      </div>
                    </div>
                 ))}

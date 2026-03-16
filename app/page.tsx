@@ -1,151 +1,133 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { MenuItemCard } from '@/components/menu/menu-item-card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Star, Clock } from 'lucide-react'
+import { CategorySidebar } from '@/components/menu/category-sidebar'
+import { MenuGrid } from '@/components/menu/menu-grid'
+import { RestaurantNavbar } from '@/components/layout/restaurant-navbar'
+import { CartSummaryBar } from '@/components/cart/cart-summary-bar'
+import { Sheet } from '@/components/ui/sheet'
+import { CartDrawer } from '@/components/cart/cart-drawer'
 
-export const revalidate = 0
+const CATEGORY_IMAGES: Record<string, string> = {
+  'all': '/combo.png',
+  'combos': '/combo.png',
+  'pizza': '/pizza.png',
+  'burger': '/burger.png',
+  'sandwich': '/sandwich.png',
+  'tacos': '/tacos.png',
+  'drink': '/pizza.png',
+  'dessert': '/pizza.png',
+  'side': '/tacos.png',
+}
 
-export default async function Home() {
-  const supabase = await createClient()
+export default function HomePage() {
+  const [categories, setCategories] = useState<any[]>([])
+  const [menuItems, setMenuItems] = useState<any[]>([])
+  const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<any>(null)
 
-  // Fetch categories
-  const { data: categories, error: catsError } = await fallbackFetchCategories(supabase)
-  // Fetch menu items with variants
-  const { data: menuItems, error: itemsError } = await fallbackFetchMenuItems(supabase)
+  useEffect(() => {
+    async function fetchData() {
+      const supabase = createClient()
+      
+      const { data: cats, error: catsError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name')
 
-  const isError = catsError || itemsError
+      const { data: items, error: itemsError } = await supabase
+        .from('menu_items')
+        .select('*, menu_variants (*)')
+        .order('name')
+
+      if (catsError || itemsError) {
+        setError({ catsError, itemsError })
+      } else {
+        const enhancedCats = [
+          { id: 'all', name: 'All', image_url: CATEGORY_IMAGES['all'] },
+          { id: 'combos', name: 'Combos', image_url: CATEGORY_IMAGES['combos'] },
+          ...(cats || []).map(c => ({
+            ...c,
+            image_url: CATEGORY_IMAGES[c.name.toLowerCase()] || CATEGORY_IMAGES['pizza']
+          }))
+        ]
+        setCategories(enhancedCats)
+        setMenuItems(items || [])
+        setActiveCategory('all')
+      }
+      setLoading(false)
+    }
+
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h2 className="text-2xl font-bold text-destructive mb-2">Failed to load menu</h2>
+        <p className="text-muted-foreground italic">Please check your database connection.</p>
+      </div>
+    )
+  }
+
+  const filteredItems = menuItems.filter(item => {
+    if (activeCategory === 'all') return true
+    if (activeCategory === 'combos') return item.is_combo || item.name.toLowerCase().includes('combo')
+    return item.category_id === activeCategory
+  })
 
   return (
-    <div className="flex flex-col min-h-screen pb-20">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-background py-16 overflow-hidden">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 space-y-6 z-10">
-            <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2" />
-              Now delivering to your area!
-            </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground">
-              Delicious Food, <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500">
-                Delivered Fast
-              </span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-[600px] leading-relaxed">
-              Craving pizza, burgers, or tacos? Get the best local food delivered straight to your door in under 30 minutes. Hot, fresh, and ready to eat.
-            </p>
-            
-            <div className="flex items-center gap-8 pt-6 border-t border-border/50">
-              <div className="flex flex-col gap-1">
-                <span className="text-3xl font-bold flex items-center gap-1">4.9 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /></span>
-                <span className="text-sm text-muted-foreground">10k+ Reviews</span>
-              </div>
-              <div className="w-px h-12 bg-border/50" />
-              <div className="flex flex-col gap-1">
-                <span className="text-3xl font-bold">30m</span>
-                <span className="text-sm text-muted-foreground">Avg Delivery</span>
-              </div>
-            </div>
-          </div>
+    <Sheet>
+      <div className="flex flex-col min-h-screen bg-background">
+        <RestaurantNavbar />
+        
+        <div className="flex flex-1 overflow-hidden">
+          <CategorySidebar 
+            categories={categories} 
+            activeCategory={activeCategory} 
+            onCategoryChange={setActiveCategory} 
+          />
           
-          <div className="flex-1 relative w-full aspect-square max-w-lg mx-auto md:max-w-none md:aspect-auto md:h-[500px] z-10">
-             <div className="absolute inset-0 bg-gradient-to-tr from-orange-400 to-red-500 rounded-full blur-3xl opacity-20 animate-pulse" />
-             <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-2xl border bg-card flex flex-col items-center justify-center p-8 bg-[url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=2681&auto=format&fit=crop')] bg-cover bg-center before:absolute before:inset-0 before:bg-black/40">
-                <div className="relative z-20 text-center text-white space-y-4">
-                 <span className="text-6xl">🍕</span>
-                 <h2 className="text-3xl font-bold">Hot & Fresh</h2>
-                 <p className="text-white/80">Baked specially for you</p>
-                </div>
-             </div>
-             
-             <div className="absolute -bottom-6 -left-6 bg-background rounded-2xl p-4 shadow-xl border flex items-center gap-4 animate-bounce">
-                <div className="bg-green-100 p-3 rounded-full">
-                  <Clock className="text-green-600 h-6 w-6" />
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground font-semibold">Fast Delivery</div>
-                  <div className="font-bold">Under 30 Mins</div>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Full Menu Section */}
-      <section className="container mx-auto px-4 py-16" id="menu">
-        <div className="mb-12 text-center max-w-2xl mx-auto space-y-4">
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">Our Menu</h2>
-          <p className="text-lg text-muted-foreground">
-            Choose your favorites from our rich, freshly made categories below. Add to cart to see them instantly show up above!
-          </p>
-        </div>
-
-        {isError && (
-          <div className="text-center py-10">
-            <h3 className="text-2xl font-bold text-destructive mb-2">Failed to load menu</h3>
-            <p className="text-muted-foreground">Please check your database connection or schema.</p>
-          </div>
-        )}
-
-        {!isError && (!categories || categories.length === 0) ? (
-          <div className="text-center py-20 space-y-4">
-            <h3 className="text-2xl font-bold">Menu is empty</h3>
-            <p className="text-muted-foreground">No categories or items found. Waiting for database to be populated...</p>
-          </div>
-        ) : !isError && categories ? (
-           <Tabs defaultValue={categories[0]?.id.toLowerCase()} className="w-full">
-            <div className="flex justify-center mb-8 border-b overflow-x-auto no-scrollbar">
-              <TabsList className="bg-transparent h-14 w-full justify-start md:justify-center p-0 space-x-6 min-w-max">
-                {categories.map((category: any) => (
-                  <TabsTrigger 
-                    key={category.id} 
-                    value={category.id.toLowerCase()}
-                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-6 text-lg font-semibold text-muted-foreground data-[state=active]:text-foreground transition-all"
-                  >
-                    {category.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-
-            {categories.map((category: any) => {
-              const catItems = menuItems?.filter((item: any) => item.category_id === category.id) || []
+          <main className="flex-1 overflow-y-auto pb-24 md:pb-8 no-scrollbar bg-accent/5">
+            <div className="max-w-5xl mx-auto">
+               <div className="px-4 py-4 md:px-6 flex items-baseline justify-between">
+                 <h2 className="text-lg font-bold md:text-2xl tracking-tight">
+                   {categories.find(c => c.id === activeCategory)?.name}
+                 </h2>
+                 <span className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase opacity-60">
+                   {filteredItems.length} Items
+                 </span>
+               </div>
               
-              return (
-                <TabsContent key={category.id} value={category.id.toLowerCase()} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-                  {catItems.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {catItems.map((item: any) => (
-                        <MenuItemCard key={item.id} item={item} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-20 bg-muted/30 rounded-2xl border border-dashed">
-                      <p className="text-muted-foreground">No items currently available in the {category.name} category.</p>
-                    </div>
-                  )}
-                </TabsContent>
-              )
-            })}
-          </Tabs>
-        ) : null}
-      </section>
-    </div>
+              {filteredItems.length > 0 ? (
+                <MenuGrid>
+                  {filteredItems.map((item) => (
+                    <MenuItemCard key={item.id} item={item} />
+                  ))}
+                </MenuGrid>
+              ) : (
+                <div className="text-center py-20 bg-background/50 rounded-2xl border border-dashed mx-4 mt-4">
+                  <p className="text-muted-foreground text-xs font-medium">No items found in this category.</p>
+                </div>
+              )}
+            </div>
+          </main>
+        </div>
+
+        <CartSummaryBar />
+        <CartDrawer />
+      </div>
+    </Sheet>
   )
-}
-
-async function fallbackFetchCategories(supabase: any) {
-  try {
-    return await supabase.from('categories').select('*').order('name')
-  } catch (e) {
-    return { data: null, error: e }
-  }
-}
-
-async function fallbackFetchMenuItems(supabase: any) {
-  try {
-    return await supabase.from('menu_items').select('*, menu_variants (*)').order('name')
-  } catch (e) {
-    return { data: null, error: e }
-  }
 }

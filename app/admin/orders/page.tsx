@@ -14,6 +14,10 @@ export default async function AdminOrdersPage() {
     `)
     .order('created_at', { ascending: false })
 
+  const { data: menuItems } = await supabase
+    .from('menu_items')
+    .select('id, name')
+
   if (error) {
     return (
       <div className="p-8 pb-4">
@@ -31,7 +35,10 @@ export default async function AdminOrdersPage() {
         <h2 className="text-3xl font-bold tracking-tight">Orders Management</h2>
       </div>
       
-      <OrdersTable initialOrders={orders || []} />
+      <OrdersTable 
+        initialOrders={orders || []} 
+        menuItems={menuItems || []} 
+      />
     </div>
   )
 }

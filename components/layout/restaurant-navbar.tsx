@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ShoppingCart, LogIn } from 'lucide-react'
+import { ShoppingCart, LogIn, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/store/cart'
@@ -37,6 +37,13 @@ export function RestaurantNavbar() {
               <span className="sr-only">Open cart</span>
             </Button>
           </SheetTrigger>
+
+          <Button asChild variant="ghost" size="sm" className="h-9 gap-2 px-3">
+            <Link href="/track-order">
+              <Package className="h-4 w-4 text-primary" />
+              <span className="hidden sm:inline">Track Order</span>
+            </Link>
+          </Button>
 
           <Button variant="outline" size="sm" className="h-9 gap-2 px-3">
             <LogIn className="h-4 w-4" />
