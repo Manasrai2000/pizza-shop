@@ -26,7 +26,10 @@ const statusColors: Record<string, string> = {
 
 const statuses = ['Pending', 'Preparing', 'Ready', 'Completed']
 
-export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order[], menuItems: MenuItem[] }) {
+export function OrdersTable({ initialOrders, menuItems }: { 
+  initialOrders: Order[], 
+  menuItems: Pick<MenuItem, 'id' | 'name'>[] 
+}) {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')

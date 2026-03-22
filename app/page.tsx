@@ -9,6 +9,11 @@ import { RestaurantNavbar } from '@/components/layout/restaurant-navbar'
 import { CartSummaryBar } from '@/components/cart/cart-summary-bar'
 import { Sheet } from '@/components/ui/sheet'
 import { CartDrawer } from '@/components/cart/cart-drawer'
+import { MenuItem, Category as BaseCategory } from '@/lib/types'
+
+interface Category extends BaseCategory {
+  image_url: string
+}
 
 const CATEGORY_IMAGES: Record<string, string> = {
   'all': '/combo.png',
@@ -22,27 +27,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
   'side': '/tacos.png',
 }
 
-interface Category {
-  id: string
-  name: string
-  image_url: string
-}
-
-interface MenuItem {
-  id: string
-  category_id: string
-  name: string
-  description: string
-  image_url: string
-  is_veg: boolean
-  is_combo: boolean
-  is_bestseller?: boolean
-  menu_variants: {
-    id: string
-    variant_name: string
-    price: number
-  }[]
-}
+// Using global MenuItem type from @/lib/types
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([])
