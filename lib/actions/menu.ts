@@ -18,6 +18,7 @@ export interface MenuItemInput {
   image_url?: string
   is_veg: boolean
   is_bestseller?: boolean
+  is_combo?: boolean
   menu_variants?: VariantInput[]
 }
 

@@ -145,10 +145,10 @@ export function MenuManagementClient({ initialItems, categories, salesData }: Me
         </CardContent>
       </Card>
 
-      <MenuItemDialog 
-        open={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
-        item={editingItem} 
+      <MenuItemDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        item={editingItem}
         categories={categories}
         onSuccess={(newItem: any) => {
           if (editingItem) {

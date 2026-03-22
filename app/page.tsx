@@ -89,17 +89,17 @@ export default function HomePage() {
 
   return (
     <Sheet>
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col h-screen overflow-hidden bg-background">
         <RestaurantNavbar />
         
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden h-[calc(100vh-3.5rem)]">
           <CategorySidebar 
             categories={categories} 
             activeCategory={activeCategory} 
             onCategoryChange={setActiveCategory} 
           />
           
-          <main className="flex-1 overflow-y-auto pb-24 md:pb-8 no-scrollbar bg-accent/5">
+          <main className="flex-1 overflow-y-auto pb-24 md:pb-8 bg-accent/5 overflow-x-hidden relative">
             <div className="max-w-5xl mx-auto">
                <div className="px-4 py-4 md:px-6 flex items-baseline justify-between">
                  <h2 className="text-lg font-bold md:text-2xl tracking-tight">

@@ -5,6 +5,7 @@ import { useCartStore } from '@/lib/store/cart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { MarqueeText } from '@/components/ui/marquee-text'
 
 type Variant = {
   id: string
@@ -73,7 +74,11 @@ export function MenuItemCard({ item }: { item: MenuItem }) {
 
       <CardContent className="p-2 space-y-1">
         <div>
-          <h3 className="text-[12px] md:text-[13px] font-bold line-clamp-1 leading-tight">{item.name}</h3>
+          <MarqueeText 
+            text={item.name} 
+            className="text-[12px] md:text-[13px] font-bold leading-tight" 
+            speed={40}
+          />
           <p className="text-[9px] text-muted-foreground line-clamp-1 mt-0.5">
             {item.description}
           </p>

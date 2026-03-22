@@ -5,6 +5,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Image from 'next/image'
+import { MarqueeText } from '@/components/ui/marquee-text'
 
 interface Category {
   id: string
@@ -20,7 +21,7 @@ interface CategorySidebarProps {
 
 export function CategorySidebar({ categories, activeCategory, onCategoryChange }: CategorySidebarProps) {
   return (
-    <aside className="w-[80px] md:w-[120px] border-r h-[calc(100vh-3.5rem)] sticky top-14 bg-background z-30 transition-all">
+    <aside className="w-[80px] md:w-[120px] border-r h-full bg-background z-20 transition-all">
       <ScrollArea className="h-full">
         <div className="p-2 space-y-3">
           {categories.map((category) => (
@@ -28,7 +29,7 @@ export function CategorySidebar({ categories, activeCategory, onCategoryChange }
               key={category.id}
               onClick={() => onCategoryChange(category.id)}
               className={cn(
-                "w-full flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 gap-1.5 group",
+                "w-full flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 gap-1.5 group overflow-hidden max-w-full",
                 activeCategory === category.id 
                   ? "bg-primary/5 text-primary" 
                   : "text-muted-foreground hover:bg-muted"
@@ -51,12 +52,14 @@ export function CategorySidebar({ categories, activeCategory, onCategoryChange }
                   </div>
                 )}
               </div>
-              <span className={cn(
-                "text-[9px] md:text-[11px] font-bold text-center leading-tight truncate w-full",
-                activeCategory === category.id ? "text-primary" : ""
-              )}>
-                {category.name}
-              </span>
+              <MarqueeText 
+                text={category.name} 
+                className={cn(
+                  "text-[9px] md:text-[11px] font-bold text-center leading-tight w-full",
+                  activeCategory === category.id ? "text-primary" : ""
+                )}
+                speed={35}
+              />
             </button>
           ))}
         </div>

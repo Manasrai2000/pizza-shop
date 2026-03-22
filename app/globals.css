@@ -127,3 +127,24 @@
     @apply font-sans;
   }
 }
+
+@keyframes marquee-music {
+  0%, 25% { transform: translateX(0); }
+  45%, 70% { transform: translateX(var(--marquee-distance, 0px)); }
+  90%, 100% { transform: translateX(0); }
+}
+
+.animate-marquee-music {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee-music var(--marquee-duration, 8s) ease-in-out infinite;
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 1;
+  position: relative;
+}
