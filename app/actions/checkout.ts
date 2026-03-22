@@ -36,7 +36,7 @@ export async function submitOrder(prevState: CheckoutState, formData: FormData):
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        user_id: user?.id || null,
+        user_id: user?.id || null, // Explicitly null for guest checkouts
         customer_name: name,
         phone,
         address,
@@ -47,7 +47,13 @@ export async function submitOrder(prevState: CheckoutState, formData: FormData):
       .select('id')
       .single()
 
-    if (orderError) throw orderError
+    if (orderError) {
+      console.error('Supabase Order Error:', orderError)
+      if (orderError.code === '42501') {
+        throw new Error('Permission denied: Please ensure database RLS policies are active.')
+      }
+      throw new Error(orderError.message)
+    }
 
     // 2. Create Order Items
     const orderItemsToInsert = cartItems.map((item) => ({
