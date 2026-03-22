@@ -5,23 +5,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Edit, Trash2, IndianRupee, TrendingUp } from 'lucide-react'
+import { Plus, Edit, Trash2, TrendingUp } from 'lucide-react'
+import { MenuItem, Category } from '@/lib/types'
 import { MenuItemDialog } from './menu-item-dialog'
 import { deleteMenuItem } from '@/lib/actions/menu'
 import { toast } from 'sonner'
 
 interface MenuManagementClientProps {
-  initialItems: any[]
-  categories: any[]
+  initialItems: MenuItem[]
+  categories: Category[]
   salesData: Record<string, number>
 }
 
 export function MenuManagementClient({ initialItems, categories, salesData }: MenuManagementClientProps) {
   const [items, setItems] = useState(initialItems)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<any>(null)
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: MenuItem) => {
     setEditingItem(item)
     setIsDialogOpen(true)
   }
@@ -32,8 +33,9 @@ export function MenuManagementClient({ initialItems, categories, salesData }: Me
         await deleteMenuItem(id)
         setItems(items.filter(item => item.id !== id))
         toast.success('Item deleted successfully')
-      } catch (error: any) {
-        toast.error('Failed to delete item: ' + error.message)
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "An unexpected error occurred."
+        toast.error('Failed to delete item: ' + message)
       }
     }
   }
@@ -74,7 +76,7 @@ export function MenuManagementClient({ initialItems, categories, salesData }: Me
                 {items.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                      No menu items found. Click "Add Item" to get started.
+                      No menu items found. Click &quot;Add Item&quot; to get started.
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -111,7 +113,7 @@ export function MenuManagementClient({ initialItems, categories, salesData }: Me
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {item.menu_variants?.map((v: any) => (
+                          {item.menu_variants?.map((v) => (
                             <Badge key={v.id} variant="outline" className="text-[10px] bg-background">
                               {v.variant_name}: ₹{v.price}
                             </Badge>
@@ -148,9 +150,9 @@ export function MenuManagementClient({ initialItems, categories, salesData }: Me
       <MenuItemDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        item={editingItem}
+        item={editingItem || undefined}
         categories={categories}
-        onSuccess={(newItem: any) => {
+        onSuccess={(newItem: MenuItem) => {
           if (editingItem) {
             setItems(items.map(i => i.id === newItem.id ? newItem : i))
           } else {

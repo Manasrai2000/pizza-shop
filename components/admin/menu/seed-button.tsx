@@ -140,7 +140,7 @@ export function SeedMenuButton() {
       let totalInserted = 0
       for (const cat of SEED_DATA) {
         // 1. Get or create category
-        let { data: existingCats } = await supabase.from('categories').select('id').eq('name', cat.categoryName)
+        const { data: existingCats } = await supabase.from('categories').select('id').eq('name', cat.categoryName)
         let categoryId = existingCats?.[0]?.id
 
         if (!categoryId) {
@@ -160,7 +160,7 @@ export function SeedMenuButton() {
             name: item.name,
             description: item.desc || '',
             is_veg: item.isVeg,
-            is_combo: !!(item as any).isCombo,
+            is_combo: !!(item as { isCombo?: boolean }).isCombo,
             menu_variants: item.variants.map(v => ({ variant_name: v.size, price: v.price }))
           })
           totalInserted++
@@ -168,9 +168,10 @@ export function SeedMenuButton() {
       }
       toast.success(`Successfully seeded ${totalInserted} items!`)
       router.refresh()
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e)
-      toast.error('Seed failed: ' + e.message)
+      const message = e instanceof Error ? e.message : 'Unknown error'
+      toast.error('Seed failed: ' + message)
     } finally {
       setLoading(false)
     }

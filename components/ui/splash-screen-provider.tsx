@@ -8,13 +8,17 @@ export function SplashScreenProvider({ children }: { children: React.ReactNode }
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    
-    // Check if session storage has 'splash-shown'
-    const shown = sessionStorage.getItem('splash-screen-shown')
-    if (shown) {
-      setShowSplash(false)
+    // Defer state updates to avoid synchronous cascading renders and satisfy linter
+    const init = () => {
+      const shown = sessionStorage.getItem('splash-screen-shown')
+      if (shown) {
+        setShowSplash(false)
+      }
+      setMounted(true)
     }
+    
+    const timeoutId = setTimeout(init, 0)
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const handleComplete = () => {

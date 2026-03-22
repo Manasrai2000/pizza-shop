@@ -73,8 +73,9 @@ export async function submitOrder(prevState: CheckoutState, formData: FormData):
     revalidatePath('/admin/orders') // Let admin know there's a new order
 
     return { success: true, orderId: order.id }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Order submission failed:', error)
-    return { success: false, error: error.message || 'Failed to submit order' }
+    const message = error instanceof Error ? error.message : 'Failed to submit order'
+    return { success: false, error: message }
   }
 }

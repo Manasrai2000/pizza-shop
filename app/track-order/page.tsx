@@ -79,7 +79,7 @@ export default async function TrackOrderPage({
       <div className="container mx-auto px-4 py-20 text-center text-destructive">
         <AlertCircle className="h-12 w-12 mx-auto mb-4" />
         <h1 className="text-2xl font-bold tracking-tight">Order Not Found</h1>
-        <p className="mt-2 text-muted-foreground text-sm">We couldn't find an order with ID: <span className="font-bold">{rawId}</span></p>
+        <p className="mt-2 text-muted-foreground text-sm">We couldn&apos;t find an order with ID: <span className="font-bold">{rawId}</span></p>
         <p className="mt-8">
           <Link href="/track-order" className="inline-flex items-center gap-2 text-primary hover:underline font-medium">
              <ArrowLeft className="h-4 w-4" /> Try another ID

@@ -10,22 +10,7 @@ import { useCartStore } from '@/lib/store/cart'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
-type Variant = {
-  id: string
-  variant_name: string
-  price: number
-}
-
-type MenuItem = {
-  id: string
-  category_id: string
-  name: string
-  description: string
-  image_url: string
-  is_veg: boolean
-  is_bestseller?: boolean
-  menu_variants: Variant[]
-}
+import { MenuItem } from '@/lib/types'
 
 interface MenuItemBottomSheetProps {
   item: MenuItem
@@ -36,11 +21,11 @@ interface MenuItemBottomSheetProps {
 
 export function MenuItemBottomSheet({ item, isOpen, onClose, mode }: MenuItemBottomSheetProps) {
   const variants = item.menu_variants || []
-  const [selectedVariantId, setSelectedVariantId] = useState<string>(variants[0]?.id || '')
+  const [selectedVariantId, setSelectedVariantId] = useState<string>(variants[0]?.id || variants[0]?.variant_name || '')
   const addItem = useCartStore((state) => state.addItem)
 
   // Find the selected variant object
-  const selectedVariant = variants.find(v => v.id === selectedVariantId) || variants[0]
+  const selectedVariant = variants.find(v => (v.id || v.variant_name) === selectedVariantId) || variants[0]
 
   const handleAddToCart = () => {
     if (!selectedVariant) return
@@ -122,17 +107,17 @@ export function MenuItemBottomSheet({ item, isOpen, onClose, mode }: MenuItemBot
           >
             {variants.map((v) => (
               <Label
-                key={v.id}
-                htmlFor={v.id}
+                key={v.id || v.variant_name}
+                htmlFor={v.id || v.variant_name}
                 className={cn(
                   "flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer",
-                  selectedVariantId === v.id 
+                  selectedVariantId === (v.id || v.variant_name) 
                     ? "border-primary bg-primary/5 shadow-sm" 
                     : "border-border/60 hover:border-border hover:bg-muted/50"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <RadioGroupItem value={v.id} id={v.id} className="h-5 w-5" />
+                  <RadioGroupItem value={v.id || v.variant_name} id={v.id || v.variant_name} className="h-5 w-5" />
                   <span className="font-semibold text-base">{v.variant_name}</span>
                 </div>
                 <span className="font-bold text-base">₹{v.price}</span>

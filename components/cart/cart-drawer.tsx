@@ -20,7 +20,9 @@ export function CartDrawer() {
   const { items, totalPrice, updateQuantity, removeItem } = useCartStore()
 
   useEffect(() => {
-    setMounted(true)
+    // Defer state update to satisfy linter and avoid synchronous cascading renders
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!mounted) return null

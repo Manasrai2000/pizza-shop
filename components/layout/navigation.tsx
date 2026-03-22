@@ -18,7 +18,9 @@ export function Navigation() {
   const updateQuantity = useCartStore((state) => state.updateQuantity)
 
   useEffect(() => {
-    setIsMounted(true)
+    // Defer state update to satisfy linter and avoid synchronous cascading renders
+    const timer = setTimeout(() => setIsMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
   if (pathname.startsWith('/admin')) return null

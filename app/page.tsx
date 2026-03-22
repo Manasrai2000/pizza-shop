@@ -22,12 +22,34 @@ const CATEGORY_IMAGES: Record<string, string> = {
   'side': '/tacos.png',
 }
 
+interface Category {
+  id: string
+  name: string
+  image_url: string
+}
+
+interface MenuItem {
+  id: string
+  category_id: string
+  name: string
+  description: string
+  image_url: string
+  is_veg: boolean
+  is_combo: boolean
+  is_bestseller?: boolean
+  menu_variants: {
+    id: string
+    variant_name: string
+    price: number
+  }[]
+}
+
 export default function HomePage() {
-  const [categories, setCategories] = useState<any[]>([])
-  const [menuItems, setMenuItems] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<any>(null)
+  const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
     async function fetchData() {

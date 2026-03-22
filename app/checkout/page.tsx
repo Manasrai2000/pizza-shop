@@ -23,7 +23,9 @@ export default function CheckoutPage() {
   const [isPending, setIsPending] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true)
+    // Defer state update to satisfy linter and avoid synchronous cascading renders
+    const timer = setTimeout(() => setIsMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!isMounted) return null

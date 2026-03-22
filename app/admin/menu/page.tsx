@@ -10,7 +10,7 @@ export default async function AdminMenuPage() {
   const [
     { data: menuItems, error: itemsError },
     { data: categories, error: catsError },
-    { data: orderItems, error: salesError }
+    { data: orderItems }
   ] = await Promise.all([
     supabase.from('menu_items').select('*, menu_variants (*)').order('name'),
     supabase.from('categories').select('*').order('name'),

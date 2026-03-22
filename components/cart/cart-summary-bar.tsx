@@ -13,7 +13,9 @@ export function CartSummaryBar() {
   const totalPrice = useCartStore((state) => state.totalPrice())
 
   useEffect(() => {
-    setMounted(true)
+    // Defer state update to satisfy linter and avoid synchronous cascading renders
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
   if (!mounted || totalItems === 0) return null

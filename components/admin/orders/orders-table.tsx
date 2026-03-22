@@ -9,33 +9,13 @@ import { Badge } from '@/components/ui/badge'
 import { MoreHorizontal, Volume2, VolumeX, MessageSquare, Search, Eye, PhoneIcon, MapPin, Package } from 'lucide-react'
 import { toast } from 'sonner'
 import { updateOrderStatus } from '@/app/actions/orders'
+import { Order, MenuItem } from '@/lib/types'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 
-type Order = {
-  id: string
-  customer_name: string
-  phone: string
-  address: string
-  notes: string | null
-  status: string
-  total_amount: number
-  created_at: string
-  order_items?: {
-    id: string
-    menu_item_id: string
-    variant_name: string
-    price: number
-    quantity: number
-  }[]
-}
 
-type MenuItem = {
-  id: string
-  name: string
-}
 
 const statusColors: Record<string, string> = {
   'Pending': 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20',
@@ -61,7 +41,7 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
     if (!soundEnabled) return
     try {
       if (!audioContext.current) {
-        audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+        audioContext.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
       }
       const oscillator = audioContext.current.createOscillator()
       const gainNode = audioContext.current.createGain()
@@ -115,6 +95,7 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
     return () => {
       supabase.removeChannel(channel)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, soundEnabled])
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -127,9 +108,10 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
       toast.success("Status Updated", {
         description: `Order is now ${newStatus}`,
       })
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "An unexpected error occurred."
       toast.error("Error updating status", {
-        description: e.message,
+        description: message,
       })
       // Revert optimistic update by refreshing
       window.location.reload()
@@ -177,6 +159,8 @@ Thank you for ordering with ${restaurantName}!`
     )
   })
 
+
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
@@ -221,14 +205,14 @@ Thank you for ordering with ${restaurantName}!`
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.length === 0 ? (
+            {filteredOrders.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   No orders found.
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order) => (
+              filteredOrders.map((order) => (
                 <TableRow key={order.id} className="hover:bg-muted/30 transition-colors">
                   <TableCell className="font-bold text-primary font-mono cursor-help" title={order.id}>
                     #{order.id.slice(-4).toUpperCase()}
@@ -333,7 +317,7 @@ Thank you for ordering with ${restaurantName}!`
                   {selectedOrder?.notes && (
                     <div className="bg-muted/30 p-3 rounded-md border border-dashed">
                       <h4 className="text-xs font-bold text-muted-foreground uppercase mb-1">Kitchen Notes</h4>
-                      <p className="text-sm italic">"{selectedOrder.notes}"</p>
+                      <p className="text-sm italic">&quot;{selectedOrder.notes}&quot;</p>
                     </div>
                   )}
                 </div>

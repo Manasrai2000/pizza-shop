@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, CheckCircle2, Clock, MapPin, Phone, ChefHat, MessageSquare } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Clock, MapPin, Phone, ChefHat } from 'lucide-react'
 
 type OrderItem = {
   id: string
@@ -70,7 +70,7 @@ export function OrderTracking({ initialOrder, menuItems }: { initialOrder: Order
     'Cancelled': 'bg-destructive/10 text-destructive',
   }
 
-  const statusIcons: Record<string, any> = {
+  const statusIcons: Record<string, React.ComponentType<{ className?: string }>> = {
     'Pending': Clock,
     'Preparing': ChefHat,
     'Ready': CheckCircle2,
@@ -130,7 +130,7 @@ export function OrderTracking({ initialOrder, menuItems }: { initialOrder: Order
             {order.notes && (
               <div className="pt-4 mt-4 border-t">
                 <p className="text-sm font-medium">Delivery Notes:</p>
-                <p className="text-sm text-muted-foreground italic mt-1">"{order.notes}"</p>
+                <p className="text-sm text-muted-foreground italic mt-1">&quot;{order.notes}&quot;</p>
               </div>
             )}
           </CardContent>

@@ -8,23 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { MarqueeText } from '@/components/ui/marquee-text'
 import { MenuItemBottomSheet } from '@/components/menu/menu-item-bottom-sheet'
-
-type Variant = {
-  id: string
-  variant_name: string
-  price: number
-}
-
-type MenuItem = {
-  id: string
-  category_id: string
-  name: string
-  description: string
-  image_url: string
-  is_veg: boolean
-  is_bestseller?: boolean
-  menu_variants: Variant[]
-}
+import { MenuItem } from '@/lib/types'
 
 export function MenuItemCard({ item }: { item: MenuItem }) {
   const addItem = useCartStore((state) => state.addItem)

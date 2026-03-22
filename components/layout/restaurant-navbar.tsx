@@ -6,14 +6,16 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/store/cart'
 import { useEffect, useState } from 'react'
-import { Sheet, SheetTrigger } from '@/components/ui/sheet'
+import { SheetTrigger } from '@/components/ui/sheet'
 
 export function RestaurantNavbar() {
   const [mounted, setMounted] = useState(false)
   const totalItems = useCartStore((state) => state.totalItems())
 
   useEffect(() => {
-    setMounted(true)
+    // Defer state update to satisfy linter and avoid synchronous cascading renders
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
   return (

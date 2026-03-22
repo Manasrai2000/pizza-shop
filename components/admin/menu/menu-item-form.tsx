@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm, useFieldArray, SubmitHandler, FieldValues } from 'react-hook-form'
+import { useForm, useFieldArray, SubmitHandler, Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch'
 import { upsertMenuItem } from '@/lib/actions/menu'
 import { toast } from 'sonner'
 import { Plus, Trash2, Loader2 } from 'lucide-react'
+import { MenuItem, Category } from '@/lib/types'
 
 const menuItemSchema = z.object({
   id: z.string().optional(),
@@ -35,9 +36,9 @@ const menuItemSchema = z.object({
 type MenuItemFormValues = z.infer<typeof menuItemSchema>
 
 interface MenuItemFormProps {
-  item?: any
-  categories: any[]
-  onSuccess: (item: any) => void
+  item?: MenuItem
+  categories: Category[]
+  onSuccess: (item: MenuItem) => void
   onCancel: () => void
 }
 
@@ -45,7 +46,7 @@ export function MenuItemForm({ item, categories, onSuccess, onCancel }: MenuItem
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { register, control, handleSubmit, formState: { errors }, watch, setValue } = useForm<MenuItemFormValues>({
-    resolver: zodResolver(menuItemSchema) as any,
+    resolver: zodResolver(menuItemSchema) as Resolver<MenuItemFormValues>,
     defaultValues: item ? {
       ...item,
       menu_variants: item.menu_variants?.length > 0 ? item.menu_variants : [{ variant_name: 'Regular', price: 0 }]
@@ -74,17 +75,18 @@ export function MenuItemForm({ item, categories, onSuccess, onCancel }: MenuItem
       const result = await upsertMenuItem(data)
       if (result.success) {
         toast.success(item ? 'Item updated' : 'Item created')
-        onSuccess({ ...data, id: result.id })
+        onSuccess({ ...data, id: result.id as string })
       }
-    } catch (error: any) {
-      toast.error('Error: ' + error.message)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "An unexpected error occurred."
+      toast.error('Error: ' + message)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Item Name</Label>
@@ -96,7 +98,7 @@ export function MenuItemForm({ item, categories, onSuccess, onCancel }: MenuItem
           <Label htmlFor="category">Category</Label>
           <Select 
             onValueChange={(value) => setValue('category_id', value)} 
-            defaultValue={watch('category_id')}
+            defaultValue={watch('category_id') || ''}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a category" />

@@ -44,9 +44,10 @@ export default function LoginPage() {
         router.push('/admin')
         router.refresh()
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "An unexpected error occurred."
       toast.error("Error", {
-        description: error.message || "An expected error occurred."
+        description: message
       })
     } finally {
       setLoading(false)

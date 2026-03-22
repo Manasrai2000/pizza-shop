@@ -1,14 +1,15 @@
 'use client'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { MenuItem, Category } from '@/lib/types'
 import { MenuItemForm } from './menu-item-form'
 
 interface MenuItemDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  item?: any
-  categories: any[]
-  onSuccess: (item: any) => void
+  item?: MenuItem
+  categories: Category[]
+  onSuccess: (item: MenuItem) => void
 }
 
 export function MenuItemDialog({ open, onOpenChange, item, categories, onSuccess }: MenuItemDialogProps) {
