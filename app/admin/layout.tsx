@@ -22,7 +22,7 @@ export default async function AdminLayout({
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background sm:flex">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="text-2xl">🍕</span> BiteExpress Admin
+            <span className="text-2xl">🍕</span> PizzaExpert Admin
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-4">
@@ -55,13 +55,13 @@ export default async function AdminLayout({
             {user.email}
           </div>
           <form action="/auth/signout" method="post" className="w-full">
-             <Button variant="outline" className="w-full justify-start gap-2" type="submit">
-               <LogOut className="h-4 w-4" /> Sign out
-             </Button>
+            <Button variant="outline" className="w-full justify-start gap-2" type="submit">
+              <LogOut className="h-4 w-4" /> Sign out
+            </Button>
           </form>
         </div>
       </aside>
-      
+
       <main className="flex w-full flex-col sm:pl-64">
         {children}
       </main>

@@ -4,7 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,9 +17,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BiteExpress | Food Ordering",
+  title: "PizzaExpert | Food Ordering",
   description: "Order your favorite pizzas, burgers, tacos and more.",
 };
+
+import { SplashScreenProvider } from "@/components/ui/splash-screen-provider";
 
 export default function RootLayout({
   children,
@@ -31,8 +33,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        {children}
-        <Toaster />
+        <SplashScreenProvider>
+          {children}
+          <Toaster />
+        </SplashScreenProvider>
       </body>
     </html>
   );

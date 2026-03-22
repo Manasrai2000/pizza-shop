@@ -1,7 +1,4 @@
 'use client'
-
-import React from 'react'
-
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Image from 'next/image'
@@ -23,13 +20,13 @@ export function CategorySidebar({ categories, activeCategory, onCategoryChange }
   return (
     <aside className="w-[80px] md:w-[120px] border-r h-full bg-background z-20 transition-all">
       <ScrollArea className="h-full">
-        <div className="p-2 space-y-3">
+        <div className="p-1 space-y-3">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => onCategoryChange(category.id)}
               className={cn(
-                "w-full flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 gap-1.5 group overflow-hidden max-w-full",
+                "w-[70px] md:w-[110px] flex flex-col items-center justify-center px-1 py-2 rounded-lg transition-all duration-200 gap-1.5 group overflow-hidden max-w-full",
                 activeCategory === category.id 
                   ? "bg-primary/5 text-primary" 
                   : "text-muted-foreground hover:bg-muted"

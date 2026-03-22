@@ -52,7 +52,7 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const supabase = createClient()
-  
+
   // Create an audio instance for the alert sound
   // Note: We use a simple base64 beep sound to avoid needing external assets
   const audioContext = useRef<AudioContext | null>(null)
@@ -65,16 +65,16 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
       }
       const oscillator = audioContext.current.createOscillator()
       const gainNode = audioContext.current.createGain()
-      
+
       oscillator.type = 'sine'
       oscillator.frequency.setValueAtTime(880, audioContext.current.currentTime) // A5
-      
+
       gainNode.gain.setValueAtTime(0.1, audioContext.current.currentTime)
       gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.current.currentTime + 0.5)
-      
+
       oscillator.connect(gainNode)
       gainNode.connect(audioContext.current.destination)
-      
+
       oscillator.start()
       oscillator.stop(audioContext.current.currentTime + 0.5)
     } catch (e) {
@@ -102,11 +102,11 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
             playBeep()
           } else if (payload.eventType === 'UPDATE') {
             const updatedOrder = payload.new as Order
-            setOrders((prev) => 
+            setOrders((prev) =>
               prev.map(o => o.id === updatedOrder.id ? updatedOrder : o)
             )
           } else if (payload.eventType === 'DELETE') {
-             setOrders((prev) => prev.filter(o => o.id !== payload.old.id))
+            setOrders((prev) => prev.filter(o => o.id !== payload.old.id))
           }
         }
       )
@@ -121,9 +121,9 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
     try {
       // Optimistic update
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
-      
+
       await updateOrderStatus(orderId, newStatus)
-      
+
       toast.success("Status Updated", {
         description: `Order is now ${newStatus}`,
       })
@@ -137,7 +137,7 @@ export function OrdersTable({ initialOrders, menuItems }: { initialOrders: Order
   }
 
   const sendWhatsAppUpdate = (order: Order) => {
-    const restaurantName = "BiteExpress"
+    const restaurantName = "PizzaExpert"
     const orderIdShort = order.id
     const itemsSummary = order.order_items?.map(item => {
       const menuItem = menuItems.find(m => m.id === item.menu_item_id)
@@ -161,7 +161,7 @@ Thank you for ordering with ${restaurantName}!`
     const cleanPhone = order.phone.replace(/\D/g, '')
     // Add country code if not present (assuming Indian numbers based on ₹, usually starts with 91)
     const phoneWithCode = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone
-    
+
     const whatsappUrl = `https://wa.me/${phoneWithCode}?text=${encodedMessage}`
     window.open(whatsappUrl, '_blank')
   }
@@ -182,23 +182,23 @@ Thank you for ordering with ${restaurantName}!`
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search orders by name, phone, or ID..." 
+          <Input
+            placeholder="Search orders by name, phone, or ID..."
             className="pl-9 h-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="flex items-center gap-4 bg-muted/50 p-2 rounded-lg border w-full md:w-auto">
-           <div className="flex items-center gap-2 px-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-xs font-medium text-muted-foreground">Live</span>
-           </div>
-           <Separator orientation="vertical" className="h-6" />
-           <Button 
-            variant="ghost" 
-            size="sm" 
+          <div className="flex items-center gap-2 px-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="text-xs font-medium text-muted-foreground">Live</span>
+          </div>
+          <Separator orientation="vertical" className="h-6" />
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={`h-8 hover:bg-background ${soundEnabled ? 'text-primary font-bold' : 'text-muted-foreground'}`}
           >
@@ -257,22 +257,22 @@ Thank you for ordering with ${restaurantName}!`
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {statuses.map((s) => (
-                          <DropdownMenuItem 
-                            key={s} 
+                          <DropdownMenuItem
+                            key={s}
                             onClick={() => handleStatusChange(order.id, s)}
                             className={order.status === s ? 'font-bold bg-muted' : ''}
                           >
                             {s}
                           </DropdownMenuItem>
                         ))}
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => setSelectedOrder(order)}
                           className="border-t mt-1"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => sendWhatsAppUpdate(order)}
                           className="text-primary font-medium"
                         >
@@ -306,7 +306,7 @@ Thank you for ordering with ${restaurantName}!`
               </Badge>
             </div>
           </DialogHeader>
-          
+
           <ScrollArea className="flex-1">
             <div className="p-6 space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -372,7 +372,7 @@ Thank you for ordering with ${restaurantName}!`
           <DialogFooter className="p-4 border-t bg-muted/20">
             <div className="flex gap-2 w-full justify-end">
               <Button variant="outline" onClick={() => setSelectedOrder(null)}>Close</Button>
-              <Button 
+              <Button
                 onClick={() => selectedOrder && sendWhatsAppUpdate(selectedOrder)}
                 className="bg-[#25D366] hover:bg-[#128C7E] text-white"
               >

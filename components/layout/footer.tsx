@@ -14,10 +14,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <h3 className="text-xl font-bold flex items-center gap-2">
-              <span className="text-2xl">🍕</span> BiteExpress
+              <span className="text-2xl">🍕</span> PizzaExpert
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Serving the best pizzas, burgers, and tacos in town. 
+              Serving the best pizzas, burgers, and tacos in town.
               Hot, fresh, and lightning fast.
             </p>
             <div className="flex space-x-4">
@@ -35,7 +35,7 @@ export function Footer() {
               </Link>
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Menu</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -45,7 +45,7 @@ export function Footer() {
               <li><Link href="/#menu" className="hover:text-primary transition-colors">Tacos</Link></li>
             </ul>
           </div>
-          
+
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -55,19 +55,19 @@ export function Footer() {
               <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
-          
+
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Contact Us</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>123 Fast Food Street, NY 10001</li>
-              <li>hello@biteexpress.com</li>
+              <li>hello@pizzaexpert.com</li>
               <li>(555) 123-4567</li>
             </ul>
           </div>
         </div>
-        
+
         <div className="mt-12 border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} BiteExpress. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} PizzaExpert. All rights reserved.</p>
           <p>Powered by Next.js & Supabase</p>
         </div>
       </div>

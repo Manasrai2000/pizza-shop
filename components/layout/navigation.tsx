@@ -27,9 +27,9 @@ export function Navigation() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight hover:text-primary transition-colors">
-          <span className="text-2xl">🍕</span> BiteExpress
+          <span className="text-2xl">🍕</span> PizzaExpert
         </Link>
-        
+
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <Link href="/track-order" className="transition-colors hover:text-primary text-foreground/60">
             Track Order
@@ -73,23 +73,23 @@ export function Navigation() {
                             {item.variantName}
                           </div>
                           <div className="flex items-center gap-2 mt-2">
-                             <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              >
-                                -
-                              </Button>
-                              <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              >
-                                +
-                              </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            >
+                              -
+                            </Button>
+                            <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            >
+                              +
+                            </Button>
                           </div>
                         </div>
                         <div className="flex flex-col items-end space-y-2">
@@ -110,7 +110,7 @@ export function Navigation() {
                   </div>
                 )}
               </div>
-              
+
               {isMounted && items.length > 0 && (
                 <div className="pr-6 pt-4 border-t">
                   <div className="flex justify-between items-center mb-4">
@@ -137,7 +137,7 @@ export function Navigation() {
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
               <div className="flex flex-col gap-8 py-8">
                 <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-                  <span className="text-2xl">🍕</span> BiteExpress
+                  <span className="text-2xl">🍕</span> PizzaExpert
                 </Link>
                 <nav className="flex flex-col gap-4 text-lg font-medium">
                   <Link href="/track-order" className="transition-colors hover:text-primary">

@@ -1,6 +1,6 @@
-# BiteExpress 🍕 | Premium Food Ordering Platform
+# PizzaExpert 🍕 | Premium Food Ordering Platform
 
-BiteExpress is a modern, high-performance food ordering application built with Next.js 15, Supabase, and Tailwind CSS. It features a sleek, responsive UI for exploring menus, managing orders, and an integrated admin panel for business management.
+PizzaExpert is a modern, high-performance food ordering application built with Next.js 15, Supabase, and Tailwind CSS. It features a sleek, responsive UI for exploring menus, managing orders, and an integrated admin panel for business management.
 
 ## ✨ Key Features
 
