@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import {  Loader2 } from 'lucide-react'
+import { validatePhoneNumber } from '@/lib/utils/phone-validation'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -42,6 +43,28 @@ export default function CheckoutPage() {
 
   async function clientAction(formData: FormData) {
     setIsPending(true)
+    
+    // Validate phone number using Abstract API
+    let phone = formData.get('phone') as string
+    if (phone) {
+      // Prepend +91 if not already present
+      if (!phone.startsWith('+91')) {
+        phone = `+91${phone}`
+      }
+      
+      const validationResult = await validatePhoneNumber(phone)
+      if (validationResult && !validationResult.phone_validation.is_valid) {
+        toast.error("Invalid Phone Number", {
+          description: "Please enter a valid active phone number.",
+        })
+        setIsPending(false)
+        return
+      }
+      
+      // Update formData with the full phone number for submission
+      formData.set('phone', phone)
+    }
+
     formData.append('cartData', JSON.stringify(items))
     formData.append('totalAmount', totalPrice.toString())
     
@@ -81,7 +104,20 @@ export default function CheckoutPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" type="tel" required placeholder="(555) 123-4567" disabled={isPending}/>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center h-10 px-3 bg-muted border rounded-md text-sm font-medium text-muted-foreground shrink-0">
+                        +91
+                      </div>
+                      <Input 
+                        id="phone" 
+                        name="phone" 
+                        type="tel" 
+                        required 
+                        placeholder="7007734039" 
+                        disabled={isPending}
+                        className="flex-1"
+                      />
+                    </div>
                   </div>
                 </div>
                 
