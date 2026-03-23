@@ -15,62 +15,53 @@ export function MetricsCards({ totalRevenue, totalOrders, activeItems, pendingOr
       title: "Total Revenue",
       value: `₹${totalRevenue.toLocaleString('en-IN')}`,
       icon: IndianRupee,
-      trend: "+12.5%",
-      isPositive: true,
-      subtitle: "vs last month"
+      subtitle: "Lifetime revenue",
+      color: "text-blue-500",
+      bg: "bg-blue-500/10"
     },
     {
       title: "Total Orders",
       value: totalOrders,
       icon: ShoppingBag,
-      trend: "+8.2%",
-      isPositive: true,
-      subtitle: "vs last month"
+      subtitle: "Lifetime orders",
+      color: "text-orange-500",
+      bg: "bg-orange-500/10"
     },
     {
       title: "Active Items",
       value: activeItems,
       icon: Pizza,
-      trend: "0%",
-      isPositive: null,
-      subtitle: "currently on menu"
+      subtitle: "Currently on menu",
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10"
     },
     {
       title: "Pending Orders",
       value: pendingOrders,
       icon: CopyCheck,
-      trend: pendingOrders > 5 ? "+2" : "-1",
-      isPositive: pendingOrders <= 5,
-      subtitle: "needs attention"
+      subtitle: "Needs attention",
+      color: "text-rose-500",
+      bg: "bg-rose-500/10"
     }
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       {metrics.map((metric, i) => {
         const Icon = metric.icon
         return (
-          <Card key={i} className="rounded-xl border shadow-sm">
-            <CardContent className="p-5 flex flex-col justify-between h-full space-y-3">
+          <Card key={i} className="rounded-xl border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300">
+            <CardContent className="p-3 flex flex-col justify-between h-full space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground tracking-tight">{metric.title}</span>
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Icon className="h-4 w-4 text-primary" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{metric.title}</span>
+                <div className={cn("h-7 w-7 rounded-md flex items-center justify-center", metric.bg)}>
+                  <Icon className={cn("h-3.5 w-3.5", metric.color)} />
                 </div>
               </div>
               <div>
-                <div className="text-3xl font-bold tracking-tight">{metric.value}</div>
-                <div className="flex items-center mt-1 gap-2">
-                  {metric.isPositive !== null && (
-                    <span className={cn(
-                      "flex items-center text-xs font-semibold",
-                      metric.isPositive ? "text-emerald-500" : "text-rose-500"
-                    )}>
-                      {metric.isPositive ? <ArrowUpRight className="h-3 w-3 mr-0.5" /> : <ArrowDownRight className="h-3 w-3 mr-0.5" />}
-                      {metric.trend}
-                    </span>
-                  )}
-                  <span className="text-xs text-muted-foreground">{metric.subtitle}</span>
+                <div className="text-xl font-bold tracking-tighter">{metric.value}</div>
+                <div className="flex items-center mt-0.5">
+                  <span className="text-[9px] font-bold text-muted-foreground tracking-tight opacity-70">{metric.subtitle}</span>
                 </div>
               </div>
             </CardContent>

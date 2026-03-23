@@ -9,49 +9,49 @@ export function QuickActions() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* Quick Actions Card */}
-      <Card className="rounded-xl border shadow-sm flex-1">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold tracking-tight">Quick Actions</CardTitle>
+      <Card className="rounded-lg border shadow-none flex-1">
+        <CardHeader className="p-3 pb-1">
+          <CardTitle className="text-base font-bold tracking-tighter uppercase">Quick Actions</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="p-3 flex flex-col gap-1.5">
           <Button 
-            className="w-full justify-start h-11" 
+            className="w-full justify-start h-8 rounded-md font-bold text-[10px] py-0" 
             variant="default"
             onClick={() => router.push('/admin/menu')}
           >
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <PlusCircle className="mr-2 h-3 w-3" />
             Add New Item
           </Button>
           <Button 
-            className="w-full justify-start h-11 bg-muted/50 text-foreground hover:bg-muted" 
+            className="w-full justify-start h-8 rounded-md font-bold text-[10px] bg-muted/50 text-foreground hover:bg-muted border-none py-0" 
             variant="outline"
             onClick={() => router.push('/admin/orders')}
           >
-            <ListOrdered className="mr-2 h-4 w-4 text-primary" />
+            <ListOrdered className="mr-2 h-3 w-3 text-primary" />
             View Orders
           </Button>
           <Button 
-            className="w-full justify-start h-11 bg-muted/50 text-foreground hover:bg-muted" 
+            className="w-full justify-start h-8 rounded-md font-bold text-[10px] bg-muted/50 text-foreground hover:bg-muted border-none py-0" 
             variant="outline"
             onClick={() => router.push('/admin/menu')}
           >
-            <Settings2 className="mr-2 h-4 w-4 text-primary" />
+            <Settings2 className="mr-2 h-3 w-3 text-primary" />
             Manage Menu
           </Button>
         </CardContent>
       </Card>
 
       {/* Alerts / Notifications Card */}
-      <Card className="rounded-xl border shadow-sm bg-orange-500/5 border-orange-500/20">
-        <CardContent className="p-4 flex gap-3">
+      <Card className="rounded-lg border shadow-none bg-orange-500/5 border-orange-500/10">
+        <CardContent className="p-2.5 flex gap-2">
           <div className="mt-0.5">
-            <BellRing className="h-5 w-5 text-orange-500" />
+            <BellRing className="h-3.5 w-3.5 text-orange-500" />
           </div>
           <div>
-            <h4 className="font-semibold text-sm text-foreground">Needs Attention</h4>
-            <p className="text-xs text-muted-foreground mt-1">2 Items are running low on stock. Please update inventory soon.</p>
+            <h4 className="font-bold text-[12px] uppercase tracking-wider text-foreground">Alert</h4>
+            <p className="text-[10px] font-bold text-muted-foreground mt-0 leading-tight">This dashboard is designed by <a href="https://github.com/Manasrai2000" className="text-primary">Manas rai</a></p>
           </div>
         </CardContent>
       </Card>

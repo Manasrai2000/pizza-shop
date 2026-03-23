@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,6 +9,7 @@ import { MenuItem, Category } from '@/lib/types'
 import { MenuItemDialog } from './menu-item-dialog'
 import { deleteMenuItem } from '@/lib/actions/menu'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 interface MenuManagementClientProps {
   initialItems: MenuItem[]
@@ -41,111 +41,97 @@ export function MenuManagementClient({ initialItems, categories, salesData }: Me
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Menu Management</h2>
-          <p className="text-muted-foreground">Manage your restaurant offerings and track sales performance.</p>
-        </div>
-        <Button onClick={() => { setEditingItem(null); setIsDialogOpen(true); }}>
-          <Plus className="mr-2 h-4 w-4" /> Add Item
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button onClick={() => { setEditingItem(null); setIsDialogOpen(true); }} className="rounded-lg h-9 px-4 font-bold transition-all hover:bg-primary/90 active:scale-95 text-xs">
+          <Plus className="mr-1.5 h-4 w-4" /> Add Item
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All Menu Items</CardTitle>
-          <CardDescription>
-            Detailed view of your menu items, variants, and sales performance.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/50">
+      <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted">
+          <Table className="min-w-[800px]">
+            <TableHeader className="bg-muted/30">
+              <tr className="hover:bg-transparent border-border/50">
+                <th className="w-[200px] h-8 text-[9px] font-black uppercase tracking-widest pl-4 text-muted-foreground/80 text-left">Item</th>
+                <th className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground/80 text-left">Category</th>
+                <th className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground/80 text-left">Props</th>
+                <th className="h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground/80 text-left">Variants</th>
+                <th className="text-right h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground/80">Sales</th>
+                <th className="text-right h-8 text-[9px] font-black uppercase tracking-widest text-muted-foreground/80 pr-4">Actions</th>
+              </tr>
+            </TableHeader>
+            <TableBody>
+              {items.length === 0 ? (
                 <TableRow>
-                  <TableHead className="w-[200px]">Item Details</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Type & Status</TableHead>
-                  <TableHead>Variants (Price)</TableHead>
-                  <TableHead className="text-right">Sales</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-medium italic">
+                    No menu items found. Click &quot;Add New Item&quot; to get started.
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                      No menu items found. Click &quot;Add Item&quot; to get started.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  items.map((item) => (
-                    <TableRow key={item.id} className="group transition-colors">
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-sm">{item.name}</span>
-                          <span className="text-[10px] text-muted-foreground line-clamp-1">{item.description}</span>
-                          {item.prep_time && (
-                            <span className="text-[10px] text-primary font-medium mt-1">🕒 {item.prep_time} mins prep</span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="text-[10px] font-bold">
-                          {categories.find(c => c.id === item.category_id)?.name || 'Unknown'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {item.is_veg ? (
-                            <Badge className="bg-green-500 hover:bg-green-600 h-5 text-[9px] uppercase font-bold border-none">Veg</Badge>
-                          ) : (
-                            <Badge className="bg-red-500 hover:bg-red-600 h-5 text-[9px] uppercase font-bold border-none">Non-Veg</Badge>
-                          )}
-                          {item.is_bestseller && (
-                            <Badge className="bg-orange-500 h-5 text-[9px] uppercase font-bold border-none">Bestseller</Badge>
-                          )}
-                          {item.is_combo && (
-                            <Badge className="bg-blue-500 h-5 text-[9px] uppercase font-bold border-none">Combo</Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {item.menu_variants?.map((v) => (
-                            <Badge key={v.id} variant="outline" className="text-[10px] bg-background">
-                              {v.variant_name}: ₹{v.price}
-                            </Badge>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex flex-col items-end">
-                          <span className="text-sm font-black flex items-center gap-1">
-                            {salesData[item.id] || 0} <TrendingUp className="h-3 w-3 text-green-500" />
+              ) : (
+                items.map((item) => (
+                  <TableRow key={item.id} className="group hover:bg-muted/30 transition-all border-border/50">
+                    <td className="pl-4 py-1.5 text-left">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-xs tracking-tight group-hover:text-primary transition-colors">{item.name}</span>
+                        <span className="text-[9px] font-bold text-muted-foreground line-clamp-1 tracking-tight">{item.description}</span>
+                        {item.prep_time && (
+                          <span className="text-[9px] text-primary font-bold mt-0.5 uppercase tracking-widest flex items-center gap-1">
+                            {item.prep_time}m
                           </span>
-                          <span className="text-[9px] text-muted-foreground uppercase font-bold">Sold</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500" onClick={() => handleEdit(item)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(item.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-1.5 text-left">
+                      <Badge variant="secondary" className="text-[9px] font-black uppercase tracking-widest bg-muted/50 border-none px-1.5 py-0 rounded-full">
+                        {categories.find(c => c.id === item.category_id)?.name || 'Unknown'}
+                      </Badge>
+                    </td>
+                    <td className="py-1.5 text-left">
+                      <div className="flex flex-wrap gap-1">
+                        {item.is_veg ? (
+                          <div className="h-2 w-2 rounded-full bg-green-500" title="Veg" />
+                        ) : (
+                          <div className="h-2 w-2 rounded-full bg-red-500" title="Non-Veg" />
+                        )}
+                        {item.is_bestseller && (
+                          <Badge className="bg-orange-500/10 text-orange-500 h-4 text-[8px] uppercase font-black tracking-widest border-none px-1.5 rounded-full">Hot</Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-1.5 text-left text-nowrap">
+                      <div className="flex flex-wrap gap-1">
+                        {item.menu_variants?.map((v: any) => (
+                          <Badge key={v.id} variant="outline" className="text-[9px] font-bold tracking-tighter bg-background/50 border-border/50 rounded-md px-1.5 py-0">
+                            {v.variant_name[0]}: ₹{v.price}
+                          </Badge>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="text-right py-1.5">
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs font-bold flex items-center gap-1 tracking-tighter">
+                          {salesData[item.id] || 0}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="text-right pr-4 py-1.5">
+                      <div className="flex justify-end gap-1 opacity-70 group-hover:opacity-100 transition-all">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-blue-500 hover:bg-blue-500/10 transition-colors" onClick={() => handleEdit(item)}>
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-destructive hover:bg-destructive/10 transition-colors" onClick={() => handleDelete(item.id)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </td>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
 
       <MenuItemDialog
         open={isDialogOpen}

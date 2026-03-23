@@ -16,18 +16,53 @@ interface Order {
 
 // Helper to group orders by day for chart
 function processChartData(orders: Order[]) {
-  if (!orders || orders.length === 0) return []
-  
   const dailyRevenue: Record<string, number> = {}
   
-  orders.forEach(order => {
-    const date = new Date(order.created_at).toLocaleDateString('en-US', { weekday: 'short' })
-    dailyRevenue[date] = (dailyRevenue[date] || 0) + (order.total_amount || 0)
-  })
+  // Get last 7 days including today
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    return d.toLocaleDateString('en-US', { weekday: 'short' })
+  }).reverse()
+
+  // Initialize with 0
+  last7Days.forEach(day => dailyRevenue[day] = 0)
   
-  return Object.keys(dailyRevenue).slice(0, 7).map(date => ({
+  if (orders && orders.length > 0) {
+    orders.forEach(order => {
+      const date = new Date(order.created_at).toLocaleDateString('en-US', { weekday: 'short' })
+      if (dailyRevenue[date] !== undefined) {
+        dailyRevenue[date] += (order.total_amount || 0)
+      }
+    })
+  }
+  
+  return last7Days.map(date => ({
     name: date,
     revenue: dailyRevenue[date]
+  }))
+}
+
+// Helper to calculate top selling items
+function processTopItems(orderItems: any[]) {
+  const itemMap: Record<string, { name: string, orders: number }> = {}
+  
+  orderItems.forEach(item => {
+    const id = item.menu_item_id
+    const name = item.menu_items?.name || 'Unknown Item'
+    if (!itemMap[id]) {
+      itemMap[id] = { name, orders: 0 }
+    }
+    itemMap[id].orders += item.quantity
+  })
+  
+  const sortedItems = Object.values(itemMap).sort((a, b) => b.orders - a.orders).slice(0, 5)
+  const maxOrders = sortedItems[0]?.orders || 1
+  
+  return sortedItems.map(item => ({
+    name: item.name,
+    orders: item.orders,
+    percentage: Math.round((item.orders / maxOrders) * 100)
   }))
 }
 
@@ -43,6 +78,10 @@ export default async function AdminDashboard() {
     .from('menu_items')
     .select('id')
 
+  const { data: orderItems } = await supabase
+    .from('order_items')
+    .select('*, menu_items(name)')
+
   const totalOrders = orders?.length || 0
   const totalRevenue = orders?.reduce((acc, order) => acc + (order.total_amount || 0), 0) || 0
   
@@ -57,13 +96,18 @@ export default async function AdminDashboard() {
   const activeItems = menuItems?.length || 0
   
   const chartData = processChartData(orders || [])
+  const topSellingItems = processTopItems(orderItems || [])
 
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6 max-w-[1600px] mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground mt-1">Welcome back. Here is your store&#39;s performance.</p>
+    <div className="flex-1 space-y-4 pb-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-0">
+          <h2 className="text-xl font-bold tracking-tighter bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent uppercase">
+            Dashboard
+          </h2>
+          <p className="text-[10px] font-bold text-muted-foreground tracking-tight opacity-70">
+            Welcome back. Here is your store overview.
+          </p>
         </div>
         
         <SummaryStrip 
@@ -80,16 +124,16 @@ export default async function AdminDashboard() {
         pendingOrders={pendingOrders} 
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-        {/* Left Column - Main Content (Spans 8 cols) */}
-        <div className="flex flex-col gap-6 lg:col-span-8">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mt-4">
+        {/* Left Column - Main Content */}
+        <div className="flex flex-col gap-4 xl:col-span-8">
           <RevenueChart data={chartData} />
           <RecentOrdersTable orders={orders || []} />
         </div>
         
-        {/* Right Column - Side Panels (Spans 4 cols) */}
-        <div className="flex flex-col gap-6 lg:col-span-4">
-          <TopItems />
+        {/* Right Column - Side Panels */}
+        <div className="flex flex-col gap-4 xl:col-span-4">
+          <TopItems data={topSellingItems} />
           <QuickActions />
         </div>
       </div>

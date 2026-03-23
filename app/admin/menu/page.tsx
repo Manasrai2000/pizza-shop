@@ -36,12 +36,23 @@ export default async function AdminMenuPage() {
   })
 
   return (
-    <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
-      <MenuManagementClient 
-        initialItems={menuItems || []} 
-        categories={categories || []} 
-        salesData={salesData}
-      />
+    <div className="flex-1 space-y-10 pb-10">
+      <div className="space-y-1">
+        <h2 className="text-4xl font-black tracking-tighter bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent italic uppercase">
+          Menu
+        </h2>
+        <p className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/60 uppercase">
+          Configure items, categories, and pricing
+        </p>
+      </div>
+      
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <MenuManagementClient 
+          initialItems={menuItems || []} 
+          categories={categories || []} 
+          salesData={salesData}
+        />
+      </div>
     </div>
   )
 }

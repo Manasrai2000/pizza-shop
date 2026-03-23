@@ -1,4 +1,4 @@
-import { IndianRupee, Store } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface SummaryStripProps {
   todayRevenue: number
@@ -8,19 +8,32 @@ interface SummaryStripProps {
 
 export function SummaryStrip({ todayRevenue, todayOrders, pendingOrders }: SummaryStripProps) {
   return (
-    <div className="flex items-center gap-4 bg-muted/40 rounded-xl px-5 py-3 border text-sm font-medium">
-      <div className="flex items-center gap-2 text-muted-foreground mr-6">
-        <Store className="h-4 w-4" />
-        <span className="text-foreground tracking-tight">Today&#39;s Overview:</span>
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 bg-muted/40 backdrop-blur-sm rounded-lg px-3 py-1 border border-border/50 w-fit">
+      <div className="flex items-center gap-2">
+        <div className="h-1 w-1 bg-primary rounded-full animate-pulse" />
+        <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/80">Stats</span>
       </div>
-      <div className="flex items-center gap-4 flex-wrap">
-        <span className="flex items-center gap-1.5"><IndianRupee className="h-3.5 w-3.5 text-primary" />{todayRevenue.toLocaleString('en-IN')}</span>
-        <span className="text-muted-foreground/30">•</span>
-        <span>{todayOrders} Orders</span>
-        <span className="text-muted-foreground/30">•</span>
-        <span className={pendingOrders > 0 ? "text-amber-500 font-bold" : ""}>
-          {pendingOrders} Pending
-        </span>
+      
+      <div className="flex items-center gap-4">
+        <div className="h-3 w-px bg-border/50 hidden sm:block" />
+        
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Rev</span>
+            <span className="text-[11px] font-bold tracking-tighter">₹{todayRevenue.toLocaleString('en-IN')}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Ord</span>
+            <span className="text-[11px] font-bold tracking-tighter">{todayOrders}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Pen</span>
+            <span className={cn("text-[11px] font-bold tracking-tighter", pendingOrders > 0 ? "text-orange-500" : "")}>
+              {pendingOrders}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   )

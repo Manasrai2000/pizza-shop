@@ -30,15 +30,22 @@ export default async function AdminOrdersPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2 mb-4">
-        <h2 className="text-3xl font-bold tracking-tight">Orders Management</h2>
+    <div className="flex-1 space-y-10 pb-10">
+      <div className="space-y-1">
+        <h2 className="text-4xl font-black tracking-tighter bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent italic uppercase">
+          Orders
+        </h2>
+        <p className="text-[10px] font-black tracking-[0.2em] text-muted-foreground/60 uppercase">
+          Manage and track customer transactions
+        </p>
       </div>
       
-      <OrdersTable 
-        initialOrders={orders || []} 
-        menuItems={menuItems || []} 
-      />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <OrdersTable 
+          initialOrders={orders || []} 
+          menuItems={menuItems || []} 
+        />
+      </div>
     </div>
   )
 }

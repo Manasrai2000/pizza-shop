@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { cn } from "@/lib/utils"
 
 
 
@@ -26,9 +27,9 @@ const statusColors: Record<string, string> = {
 
 const statuses = ['Pending', 'Preparing', 'Ready', 'Completed']
 
-export function OrdersTable({ initialOrders, menuItems }: { 
-  initialOrders: Order[], 
-  menuItems: Pick<MenuItem, 'id' | 'name'>[] 
+export function OrdersTable({ initialOrders, menuItems }: {
+  initialOrders: Order[],
+  menuItems: Pick<MenuItem, 'id' | 'name'>[]
 }) {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [soundEnabled, setSoundEnabled] = useState(true)
@@ -165,190 +166,229 @@ Thank you for ordering with ${restaurantName}!`
 
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-6">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-md group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
-            placeholder="Search orders by name, phone, or ID..."
-            className="pl-9 h-10"
+            placeholder="Search orders..."
+            className="pl-9 h-10 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="flex items-center gap-4 bg-muted/50 p-2 rounded-lg border w-full md:w-auto">
-          <div className="flex items-center gap-2 px-2">
-            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs font-medium text-muted-foreground">Live</span>
+        <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-lg border border-border/50 w-fit self-end lg:self-auto">
+          <div className="flex items-center gap-2 px-2.5 py-1 bg-background rounded-md border border-border/50">
+            <div className="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/80">Live</span>
           </div>
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-3" />
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`h-8 hover:bg-background ${soundEnabled ? 'text-primary font-bold' : 'text-muted-foreground'}`}
+            className={`h-7 px-3 rounded-md transition-all ${soundEnabled ? 'text-primary bg-primary/5 hover:bg-primary/10' : 'text-muted-foreground hover:bg-muted'}`}
           >
-            {soundEnabled ? <Volume2 className="h-4 w-4 mr-2" /> : <VolumeX className="h-4 w-4 mr-2" />}
-            {soundEnabled ? 'Sound: ON' : 'Sound: OFF'}
+            {soundEnabled ? <Volume2 className="h-3.5 w-3.5 mr-1.5" /> : <VolumeX className="h-3.5 w-3.5 mr-1.5" />}
+            <span className="text-[10px] font-bold">{soundEnabled ? 'ON' : 'OFF'}</span>
           </Button>
         </div>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Time</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredOrders.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  No orders found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredOrders.map((order) => (
-                <TableRow key={order.id} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-bold text-primary font-mono cursor-help" title={order.id}>
-                    #{order.id.slice(-4).toUpperCase()}
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{order.customer_name}</div>
-                    <div className="text-xs text-muted-foreground">{order.phone}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">{new Date(order.created_at).toLocaleTimeString()}</div>
-                    <div className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</div>
-                  </TableCell>
-                  <TableCell className="font-medium">₹{order.total_amount?.toFixed(2) || '0.00'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`border-none ${statusColors[order.status] || ''}`}>
-                      {order.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {statuses.map((s) => (
-                          <DropdownMenuItem
-                            key={s}
-                            onClick={() => handleStatusChange(order.id, s)}
-                            className={order.status === s ? 'font-bold bg-muted' : ''}
+      <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-muted">
+          <div className="min-w-[800px] lg:min-w-full">
+            <Table>
+              <TableHeader className="bg-muted/30">
+                <tr className="hover:bg-transparent border-border/50">
+                  <th className="w-[80px] h-8 text-[9px] font-black uppercase tracking-widest pl-4 text-left text-muted-foreground/80">ID</th>
+                  <th className="h-8 text-[9px] font-black uppercase tracking-widest text-left text-muted-foreground/80">Customer</th>
+                  <th className="h-8 text-[9px] font-black uppercase tracking-widest text-center text-muted-foreground/80">Time</th>
+                  <th className="h-8 text-[9px] font-black uppercase tracking-widest text-center text-muted-foreground/80">Total</th>
+                  <th className="h-8 text-[9px] font-black uppercase tracking-widest text-center text-muted-foreground/80">Status</th>
+                  <th className="h-8 text-[9px] font-black uppercase tracking-widest text-right pr-4 text-muted-foreground/80">Actions</th>
+                </tr>
+              </TableHeader>
+              <TableBody>
+                {filteredOrders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-20 text-muted-foreground font-medium italic">
+                      No orders found matching your search.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredOrders.map((order) => (
+                    <TableRow key={order.id} className="group hover:bg-muted/30 transition-all border-border/50">
+                      <td className="font-bold text-primary font-mono text-[10px] pl-4 py-1.5 text-left uppercase">
+                        <span className="opacity-40">#</span>{order.id.slice(-4)}
+                      </td>
+                      <td className="py-1.5 text-left">
+                        <div className="font-bold text-xs tracking-tight">{order.customer_name}</div>
+                        <div className="text-[9px] font-bold text-muted-foreground tracking-wide">{order.phone}</div>
+                      </td>
+                      <td className="text-center py-1.5">
+                        <div className="text-[10px] font-bold tracking-tight">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </td>
+                      <td className="text-center py-1.5">
+                         <span className="font-bold text-xs tracking-tighter">₹{order.total_amount?.toLocaleString('en-IN') || '0.00'}</span>
+                      </td>
+                      <td className="text-center py-1.5">
+                        <Badge variant="outline" className={cn("border-none font-black text-[8px] px-1.5 py-0 rounded-full uppercase tracking-widest", statusColors[order.status] || '')}>
+                          {order.status}
+                        </Badge>
+                      </td>
+                      <td className="text-right pr-4 py-1.5">
+                        <div className="flex justify-end gap-1 opacity-70 group-hover:opacity-100 transition-all">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-7 w-7 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
+                            onClick={() => {
+                              setSelectedOrder(order)
+                            }}
                           >
-                            {s}
-                          </DropdownMenuItem>
-                        ))}
-                        <DropdownMenuItem
-                          onClick={() => setSelectedOrder(order)}
-                          className="border-t mt-1"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => sendWhatsAppUpdate(order)}
-                          className="text-primary font-medium"
-                        >
-                          <MessageSquare className="h-4 w-4 mr-1" />
-                          Send Update
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-muted transition-colors">
+                                <MoreHorizontal className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-36 p-1 rounded-lg border-none shadow-2xl">
+                               <div className="px-2 py-1 mb-0.5">
+                                  <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">Status</p>
+                               </div>
+                            {statuses.map((s) => (
+                              <DropdownMenuItem
+                                key={s}
+                                onClick={() => handleStatusChange(order.id, s)}
+                                className={`rounded-md py-1.5 font-bold text-xs mb-0.5 ${order.status === s ? 'bg-primary/10 text-primary' : 'hover:bg-muted transition-colors'}`}
+                              >
+                                <div className={`h-1 w-1 rounded-full mr-1.5 ${statusColors[s]?.split(' ')[0] || 'bg-muted'}`} />
+                                {s}
+                              </DropdownMenuItem>
+                            ))}
+                            <div className="h-px bg-muted my-1 mx-2" />
+                            <DropdownMenuItem
+                              onClick={() => setSelectedOrder(order)}
+                              className="rounded-md py-1.5 font-bold text-xs hover:bg-muted transition-colors"
+                            >
+                              <Eye className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => sendWhatsAppUpdate(order)}
+                              className="rounded-md py-1.5 font-bold text-xs text-[#25D366] hover:bg-[#25D366]/10 transition-colors"
+                            >
+                              <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
+                              Send WhatsApp
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </td>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
 
       <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] p-0 overflow-hidden flex flex-col">
-          <DialogHeader className="p-6 pb-4 border-b">
+        <DialogContent className="max-w-2xl max-h-[90vh] p-0 overflow-hidden flex flex-col rounded-xl border-border/50 shadow-2xl">
+          <DialogHeader className="p-4 border-b bg-muted/20">
             <div className="flex justify-between items-center pr-8">
-              <div>
-                <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                  Order <span className="text-primary">#{selectedOrder?.id.slice(-4).toUpperCase()}</span>
+              <div className="space-y-0.5">
+                <DialogTitle className="text-lg font-black flex items-center gap-2 tracking-tight">
+                  ORDER <span className="text-primary tracking-widest">#{selectedOrder?.id.slice(-4).toUpperCase()}</span>
                 </DialogTitle>
-                <DialogDescription>
-                  Placed on {selectedOrder && new Date(selectedOrder.created_at).toLocaleString()}
+                <DialogDescription className="text-[10px] font-bold uppercase tracking-widest opacity-70">
+                  {selectedOrder && new Date(selectedOrder.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                 </DialogDescription>
               </div>
-              <Badge variant="outline" className={`text-sm px-3 py-1 border-none ${selectedOrder ? statusColors[selectedOrder.status] : ''}`}>
+              <Badge variant="outline" className={cn(
+                "border-none font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-widest",
+                statusColors[selectedOrder?.status || ''] || ''
+              )}>
                 {selectedOrder?.status}
               </Badge>
             </div>
           </DialogHeader>
 
           <ScrollArea className="flex-1">
-            <div className="p-6 space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-3">
-                      <Package className="h-4 w-4" /> RECIPIENT
+            <div className="p-4 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-6">
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                      <div className="h-1 w-1 rounded-full bg-primary" /> Recipient
                     </h4>
-                    <div className="space-y-1">
-                      <p className="font-bold text-lg">{selectedOrder?.customer_name}</p>
-                      <p className="text-sm flex items-center gap-2 text-muted-foreground">
-                        <PhoneIcon className="h-3 w-3" /> {selectedOrder?.phone}
+                    <div className="pl-3 border-l-2 border-primary/20 space-y-0.5">
+                      <p className="font-bold text-sm tracking-tight">{selectedOrder?.customer_name}</p>
+                      <p className="text-[11px] font-bold text-muted-foreground flex items-center gap-1.5">
+                        <PhoneIcon className="h-2.5 w-2.5" /> {selectedOrder?.phone}
                       </p>
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-3">
-                      <MapPin className="h-4 w-4" /> DELIVERY ADDRESS
+                  <div className="space-y-2">
+                    <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                      <div className="h-1 w-1 rounded-full bg-primary" /> Delivery Area
                     </h4>
-                    <p className="text-sm leading-relaxed">{selectedOrder?.address}</p>
+                    <div className="pl-3 border-l-2 border-primary/20">
+                      <p className="text-[11px] font-bold leading-relaxed text-muted-foreground/90">{selectedOrder?.address}</p>
+                    </div>
                   </div>
 
-                  {selectedOrder?.notes && (
-                    <div className="bg-muted/30 p-3 rounded-md border border-dashed">
-                      <h4 className="text-xs font-bold text-muted-foreground uppercase mb-1">Kitchen Notes</h4>
-                      <p className="text-sm italic">&quot;{selectedOrder.notes}&quot;</p>
+                  <div className="space-y-2">
+                    <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                      <div className="h-1 w-1 rounded-full bg-primary" /> Details
+                    </h4>
+                    <div className="pl-3 border-l-2 border-primary/20 space-y-1.5">
+                      <div className="flex justify-between items-center text-[10px] font-bold uppercase">
+                        <span className="opacity-60">Status History</span>
+                        <span className="bg-primary/10 text-primary px-1.5 rounded">{selectedOrder?.status}</span>
+                      </div>
+                      {selectedOrder?.notes && (
+                        <div className="bg-muted/30 p-2 rounded-md border border-dashed border-border/50 mt-2">
+                          <p className="text-[10px] italic font-medium leading-tight">&quot;{selectedOrder.notes}&quot;</p>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                <div>
-                  <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-3">
-                    <Package className="h-4 w-4" /> ORDER ITEMS
+                <div className="space-y-3">
+                  <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                    <Package className="h-3 w-3" /> Order Items
                   </h4>
-                  <div className="space-y-3">
-                    {selectedOrder?.order_items?.map((item) => {
-                      const menuItem = menuItems.find(m => m.id === item.menu_item_id)
-                      return (
-                        <div key={item.id} className="flex justify-between text-sm items-start">
-                          <div className="flex gap-3">
-                            <span className="font-bold text-primary">{item.quantity}×</span>
-                            <div>
-                              <p className="font-semibold">{menuItem?.name || 'Item'}</p>
-                              <p className="text-xs text-muted-foreground">{item.variant_name}</p>
+                  <div className="rounded-xl border border-border/50 overflow-hidden bg-background/50">
+                    <div className="divide-y divide-border/50">
+                      {selectedOrder?.order_items?.map((item) => {
+                        const menuItem = menuItems.find(m => m.id === item.menu_item_id)
+                        return (
+                          <div key={item.id} className="p-2.5 flex justify-between text-xs items-start hover:bg-muted/30 transition-colors">
+                            <div className="flex gap-2.5">
+                              <span className="font-black text-primary text-[10px] mt-0.5">{item.quantity}×</span>
+                              <div className="space-y-0.5">
+                                <p className="font-bold text-[11px] tracking-tight">{menuItem?.name || 'Item'}</p>
+                                <p className="text-[9px] font-black uppercase text-muted-foreground/70 tracking-tighter">{item.variant_name}</p>
+                              </div>
                             </div>
+                            <span className="font-bold text-[11px] tracking-tighter">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
                           </div>
-                          <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
-                        </div>
-                      )
-                    })}
-                    <Separator className="my-2" />
-                    <div className="flex justify-between font-bold text-lg pt-2">
-                      <span>Total Amount</span>
-                      <span className="text-primary">₹{selectedOrder?.total_amount.toFixed(2)}</span>
+                        )
+                      })}
+                    </div>
+                    <div className="p-3 bg-primary/5 border-t border-border/50">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Grand Total</span>
+                        <span className="text-sm font-black text-primary tracking-tighter">₹{selectedOrder?.total_amount.toLocaleString('en-IN')}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -356,14 +396,15 @@ Thank you for ordering with ${restaurantName}!`
             </div>
           </ScrollArea>
 
-          <DialogFooter className="p-4 border-t bg-muted/20">
+          <DialogFooter className="p-3 border-t bg-muted/20">
             <div className="flex gap-2 w-full justify-end">
-              <Button variant="outline" onClick={() => setSelectedOrder(null)}>Close</Button>
+              <Button variant="ghost" size="sm" className="text-[10px] font-black uppercase tracking-widest h-8 rounded-md" onClick={() => setSelectedOrder(null)}>Close</Button>
               <Button
+                size="sm"
                 onClick={() => selectedOrder && sendWhatsAppUpdate(selectedOrder)}
-                className="bg-[#25D366] hover:bg-[#128C7E] text-white"
+                className="bg-[#25D366] hover:bg-[#128C7E] text-white text-[10px] font-black uppercase tracking-widest h-8 rounded-md shadow-lg shadow-[#25D366]/20"
               >
-                <MessageSquare className="h-4 w-4 mr-2" />
+                <MessageSquare className="h-3.5 w-3.5 mr-2" />
                 Send Status WhatsApp
               </Button>
             </div>

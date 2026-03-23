@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 import { SplashScreenProvider } from "@/components/ui/splash-screen-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
   children,
@@ -29,14 +30,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
+    <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <SplashScreenProvider>
-          {children}
-          <Toaster />
-        </SplashScreenProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SplashScreenProvider>
+            {children}
+            <Toaster />
+          </SplashScreenProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
